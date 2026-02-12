@@ -17,7 +17,9 @@ services:
       PRINTER_PORT: ${PRINTER_PORT}
       PRINTER_DPI: ${PRINTER_DPI}
       APP_PORT: ${APP_PORT}
-      NODE_ENV: production
+      NODE_ENV: production 
+    ports:
+      - "3014:3014"
     networks:
       - core-network
     command: sh -c "npx prisma migrate deploy || true && node dist/main"
