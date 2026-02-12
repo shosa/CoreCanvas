@@ -9,8 +9,11 @@ ARG NEXT_PUBLIC_API_URL=/api
 COPY package.json ./
 COPY apps/frontend/package.json ./apps/frontend/
 
-# Install dependencies
-RUN npm install --workspace=@corecanvas/frontend
+# Install dependencies - use legacy-peer-deps to avoid React version conflicts
+RUN npm install --workspace=@corecanvas/frontend --legacy-peer-deps
+
+# Remove duplicate React from root node_modules to prevent two-copy issue
+RUN rm -rf node_modules/react node_modules/react-dom 2>/dev/null || true
 
 # Copy source
 COPY apps/frontend ./apps/frontend
