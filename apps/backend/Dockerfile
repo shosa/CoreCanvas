@@ -33,7 +33,7 @@ RUN node_modules/.bin/prisma generate --schema=./apps/backend/prisma/schema.pris
 
 # Build backend
 WORKDIR /app/apps/backend
-RUN npm run build:backend
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:18-alpine AS runner
