@@ -20,7 +20,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  const port = process.env.APP_PORT || 3014;
+  const port = process.env.APP_PORT || 87;
   await app.listen(port);
 
   console.log(`CoreCanvas Backend running on http://localhost:${port}/api`);

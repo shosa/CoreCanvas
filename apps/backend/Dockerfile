@@ -55,6 +55,6 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/backend/package.json ./packa
 # Copy node_modules from builder
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 
-EXPOSE 3014
+EXPOSE 87
 
 CMD ["node", "dist/main"]

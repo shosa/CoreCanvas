@@ -19,7 +19,7 @@ services:
       APP_PORT: ${APP_PORT}
       NODE_ENV: production
     ports:
-      - "3014:3014"
+      - "87:87"
     networks:
       - core-network
     command: sh -c "npx prisma migrate deploy || true && node dist/main"
