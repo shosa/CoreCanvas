@@ -12,8 +12,11 @@ COPY apps/frontend/package.json ./apps/frontend/
 # Install dependencies - use legacy-peer-deps to avoid React version conflicts
 RUN npm install --workspace=@corecanvas/frontend --legacy-peer-deps
 
-# Remove duplicate React from root node_modules to prevent two-copy issue
-RUN rm -rf node_modules/react node_modules/react-dom 2>/dev/null || true
+# Replace duplicate React in root node_modules with symlinks to frontend's copy
+# This ensures styled-jsx (in root) and react-dom (in frontend) use the same React instance
+RUN rm -rf node_modules/react node_modules/react-dom 2>/dev/null || true && \
+    ln -s /app/apps/frontend/node_modules/react /app/node_modules/react && \
+    ln -s /app/apps/frontend/node_modules/react-dom /app/node_modules/react-dom
 
 # Copy source
 COPY apps/frontend ./apps/frontend
