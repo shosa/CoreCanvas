@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 import { CanvasElement, LabelConfig } from '@/types';
 
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
 interface EditorState {
   // Elements
   elements: CanvasElement[];
@@ -87,7 +97,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     const newElement = {
       ...element,
-      id: crypto.randomUUID(),
+      id: generateId(),
       x: element.x + 5,
       y: element.y + 5,
     } as CanvasElement;
