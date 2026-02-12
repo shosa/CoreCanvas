@@ -31,7 +31,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build Next.js (standalone output)
 WORKDIR /app/apps/frontend
-RUN npm run build:frontend
+RUN npm run build
 
 
 ############################
