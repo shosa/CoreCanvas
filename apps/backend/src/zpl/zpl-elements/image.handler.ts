@@ -7,8 +7,12 @@ export class ImageHandler {
   async toZpl(element: any, dotsPerMm: number): Promise<string> {
     const x = Math.round(element.x * dotsPerMm);
     const y = Math.round(element.y * dotsPerMm);
-    const targetWidth = Math.round((element.width || 20) * dotsPerMm);
-    const targetHeight = Math.round((element.height || 20) * dotsPerMm);
+    // For images, the editor width/height are in editor-space (landscape).
+    // After the 90° CW rotation the printed dimensions swap:
+    //   printedWidth  = editorHeight (in dots)
+    //   printedHeight = editorWidth  (in dots)
+    const editorW = Math.round((element.width || 20) * dotsPerMm);
+    const editorH = Math.round((element.height || 20) * dotsPerMm);
 
     if (!element.minioPath) return '';
 
@@ -16,15 +20,16 @@ export class ImageHandler {
       const buffer = await this.minio.getFileBuffer(element.minioPath);
 
       let pipeline = sharp(buffer)
-        .resize(targetWidth, targetHeight, {
+        .resize(editorW, editorH, {
           fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 1 },
         })
         .flatten({ background: { r: 255, g: 255, b: 255 } });
 
-      // If the image was rotated for print (landscape→portrait), rotate the bitmap 270° (90° CCW)
-      if (element._rotatedForPrint) {
-        pipeline = pipeline.rotate(270);
+      // Rotate 90° CW so the image reads correctly when the printed
+      // label is rotated 90° CCW by the user.
+      if (element._needsImageRotation) {
+        pipeline = pipeline.rotate(90, { background: { r: 255, g: 255, b: 255 } });
       }
 
       const { data, info } = await pipeline

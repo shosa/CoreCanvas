@@ -61,9 +61,8 @@ export function CanvasInner() {
       const stage = stageRef.current;
       if (!stage) return;
 
-      const container = stage.container().getBoundingClientRect();
-      const menuX = e.evt.clientX - container.left;
-      const menuY = e.evt.clientY - container.top;
+      const menuX = e.evt.clientX;
+      const menuY = e.evt.clientY;
 
       // Find which element was right-clicked
       const target = e.target;

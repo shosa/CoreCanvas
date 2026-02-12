@@ -36,22 +36,22 @@ export class ZplService {
     variables?: Record<string, string>,
     copies: number = 1,
   ): Promise<string> {
-    // Editor works in landscape: width=174mm (horizontal), height=76mm (vertical)
-    // Printer: roll is 76mm wide, label is 174mm long in feed direction
-    // ^PW = roll width = editor height (76mm)
-    // ^LL = label length = editor width (174mm)
+    // Editor: landscape, width=174mm (horizontal), height=76mm (vertical)
+    // Printer: roll width=76mm (printhead direction), label length=174mm (feed)
     //
-    // We need to rotate the editor content 90° CCW to map onto the print:
-    //   printX = editor.height - editor.y - element.height  (flip Y into X)
-    //   printY = editor.x                                   (X becomes Y along feed)
-    //   element dimensions stay the same (no swap)
-    //   text/barcode rotation: add 270° (= 90° CCW) so content reads correctly
-    //   image: rotate 90° CCW via sharp before converting to GRF
+    // ZPL coordinate system:
+    //   X = across printhead (0..76mm)   = editor Y axis
+    //   Y = feed direction  (0..174mm)   = editor X axis
+    //
+    // To map editor → printer:
+    //   printerX = editorY    (swap axes)
+    //   printerY = editorX    (swap axes)
+    //   No dimension swap, no coordinate flip.
+    //   Text rotation: add 90° so text reads along feed (Y printer = X editor)
+    //   Image: rotate 90° CW with sharp
 
-    const printWidthMm = config.height;   // 76mm
-    const printLengthMm = config.width;   // 174mm
-    const printWidthDots = Math.round(printWidthMm * this.dotsPerMm);
-    const printLengthDots = Math.round(printLengthMm * this.dotsPerMm);
+    const printWidthDots = Math.round(config.height * this.dotsPerMm);  // 76mm
+    const printLengthDots = Math.round(config.width * this.dotsPerMm);  // 174mm
 
     let zpl = '';
     zpl += `^XA\n`;
@@ -63,11 +63,11 @@ export class ZplService {
     const sorted = [...elements].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
 
     for (const element of sorted) {
-      const rotated = this.transformForPrint(element, config.width, config.height);
+      const mapped = this.mapToPrinter(element, config);
 
-      const handler = this.getHandler(rotated.type);
+      const handler = this.getHandler(mapped.type);
       if (handler) {
-        const elementZpl = await handler.toZpl(rotated, this.dotsPerMm, variables);
+        const elementZpl = await handler.toZpl(mapped, this.dotsPerMm, variables);
         if (elementZpl) {
           zpl += elementZpl + '\n';
         }
@@ -83,30 +83,44 @@ export class ZplService {
   }
 
   /**
-   * Transform editor landscape coords to printer portrait coords.
+   * Map editor landscape coordinates to printer coordinates.
    *
-   * Editor (landscape):          Printer (portrait):
-   *   X → (0..174mm)              X → (0..76mm, across printhead)
-   *   Y ↓ (0..76mm)               Y ↓ (0..174mm, feed direction)
+   * Editor: landscape 174×76mm.  User reads it left-to-right.
+   * Printer: roll 76mm wide, label 174mm long (feed direction).
+   * When the user takes the printed label and rotates it 90° CCW,
+   * it should look exactly like the editor.
    *
-   * 90° CCW rotation:
-   *   printX = editorHeight - editorY - elementHeight
-   *   printY = editorX
-   *   width/height: NOT swapped (element keeps its own w/h)
-   *   rotation: +270° (90° CCW) so text/barcode content reads correctly
+   * Mapping:
+   *   printerX = editorY          (swap axes)
+   *   printerY = editorX          (swap axes)
+   *
+   * Text/barcode: add 90° so content reads along feed direction.
+   * Shapes (^GB): swap width↔height (no rotation param in ZPL).
+   * Images (^GFA): rotate bitmap 90° CW with sharp (no rotation param).
+   * QR codes: square, no special handling needed.
    */
-  private transformForPrint(el: any, editorWidth: number, editorHeight: number): any {
-    const printX = editorHeight - el.y - el.height;
-    const printY = el.x;
-    const printRotation = ((el.rotation || 0) + 270) % 360;
+  private mapToPrinter(el: any, config: LabelConfig): any {
+    const isShape = el.type === 'shape';
+    const isImage = el.type === 'image';
+
+    // For lines, swap orientation (horizontal ↔ vertical)
+    const orientation = isShape && el.orientation
+      ? (el.orientation === 'horizontal' ? 'vertical' : 'horizontal')
+      : el.orientation;
+
+    // Flip the editor Y axis: elements at the top of the editor (small Y)
+    // must end up at the far side of the printhead (large printerX).
+    const printerX = config.height - el.y - el.height;
 
     return {
       ...el,
-      x: printX,
-      y: printY,
-      // width and height stay the same - no swap
-      rotation: printRotation,
-      _rotatedForPrint: true, // flag for image handler
+      x: printerX,                // editor Y flipped → printer X (across printhead)
+      y: el.x,                    // editor X → printer Y (feed direction)
+      width: isShape ? el.height : el.width,    // shapes: swap w↔h
+      height: isShape ? el.width : el.height,   // shapes: swap w↔h
+      rotation: ((el.rotation || 0) + 90) % 360,
+      orientation,
+      _needsImageRotation: isImage,
     };
   }
 

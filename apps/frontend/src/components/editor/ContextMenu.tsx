@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Paper,
   MenuList,
@@ -60,15 +61,15 @@ export function ContextMenu({ x, y, elementId, onClose }: Props) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <Paper
       ref={menuRef}
       elevation={8}
       sx={{
-        position: 'absolute',
+        position: 'fixed',
         left: x,
         top: y,
-        zIndex: 1000,
+        zIndex: 9999,
         minWidth: 200,
         py: 0.5,
         borderRadius: 1.5,
@@ -118,6 +119,7 @@ export function ContextMenu({ x, y, elementId, onClose }: Props) {
           </>
         )}
       </MenuList>
-    </Paper>
+    </Paper>,
+    document.body,
   );
 }

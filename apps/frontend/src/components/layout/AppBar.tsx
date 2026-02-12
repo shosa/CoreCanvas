@@ -52,9 +52,12 @@ export function AppBar({ onSave, onLoad, onPrint, onPreviewZpl }: Props) {
     <>
       <MuiAppBar position="static" color="default" elevation={0} sx={{ borderBottom: '1px solid #e2e8f0' }}>
         <MuiToolbar variant="dense" sx={{ gap: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16, mr: 2 }}>
-            CoreCanvas
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
+            <img src="/logo.png" alt="Logo" style={{ height: 28 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16 }}>
+              CoreCanvas
+            </Typography>
+          </Box>
 
           <Button size="small" startIcon={<SaveIcon />} onClick={onSave}>
             Salva
