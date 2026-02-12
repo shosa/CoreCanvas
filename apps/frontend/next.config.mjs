@@ -13,14 +13,6 @@ const nextConfig = {
     config.externals = [...(config.externals || []), { canvas: 'canvas' }];
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://backend:87/api/:path*',
-      },
-    ];
-  },
   async redirects() {
     return [
       {
