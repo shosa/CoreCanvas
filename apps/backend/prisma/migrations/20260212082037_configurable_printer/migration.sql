@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE `printer_config` (
+    `id` VARCHAR(191) NOT NULL DEFAULT 'default',
+    `name` VARCHAR(191) NOT NULL DEFAULT 'Zebra ZT410',
+    `host` VARCHAR(191) NOT NULL DEFAULT '192.168.3.44',
+    `port` INTEGER NOT NULL DEFAULT 9100,
+    `dpi` INTEGER NOT NULL DEFAULT 203,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

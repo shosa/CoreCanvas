@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: corecanvas-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@core-mysql:3306/${MYSQL_DATABASE}
+      MINIO_ENDPOINT: core-minio
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      PRINTER_HOST: ${PRINTER_HOST}
+      PRINTER_PORT: ${PRINTER_PORT}
+      PRINTER_DPI: ${PRINTER_DPI}
+      APP_PORT: ${APP_PORT}
+      NODE_ENV: production
+    ports:
+      - "3014:3014"
+    networks:
+      - core-network
+    command: sh -c "npx prisma migrate deploy || true && node dist/main"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: corecanvas-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NODE_ENV: production
+    ports:
+      - "3008:3000"
+    depends_on:
+      - backend
+    networks:
+      - core-network
+
+networks:
+  core-network:
+    external: true
+    name: core-network
