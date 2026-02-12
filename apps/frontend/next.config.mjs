@@ -1,15 +1,12 @@
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   output: 'standalone',
+  turbopack: {},
   env: {
     API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3014',
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   webpack: (config) => {
     // Konva tries to require 'canvas' on server-side (Node.js), which we don't need
