@@ -1,34 +1,41 @@
+############################
 # Build stage
+############################
 FROM node:18-alpine AS builder
 
 WORKDIR /app
 
 ARG NEXT_PUBLIC_API_URL=/api
 
-# Copy package files
+# Copy root + frontend package manifests
 COPY package.json ./
 COPY apps/frontend/package.json ./apps/frontend/
 
-# Install dependencies - use legacy-peer-deps to avoid React version conflicts
+# Install only frontend workspace deps
 RUN npm install --workspace=@corecanvas/frontend --legacy-peer-deps
 
-# Replace duplicate React in root node_modules with symlinks to frontend's copy
-# This ensures styled-jsx (in root) and react-dom (in frontend) use the same React instance
-RUN rm -rf node_modules/react node_modules/react-dom 2>/dev/null || true && \
+# Fix React duplication between root and workspace
+RUN rm -rf node_modules/react node_modules/react-dom && \
     ln -s /app/apps/frontend/node_modules/react /app/node_modules/react && \
     ln -s /app/apps/frontend/node_modules/react-dom /app/node_modules/react-dom
 
-# Copy source
+# Copy frontend source
 COPY apps/frontend ./apps/frontend
 
-# Set env for build
+# Ensure public folder exists (Next may omit it)
+RUN mkdir -p apps/frontend/public
+
+# Build env
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build
+# Build Next.js (standalone)
 RUN npm run build:frontend
 
+
+############################
 # Production stage
+############################
 FROM node:18-alpine AS runner
 
 WORKDIR /app
@@ -36,17 +43,18 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Add non-root user
+# Non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Copy standalone build
+# Copy standalone output
 COPY --from=builder /app/apps/frontend/.next/standalone ./
 COPY --from=builder /app/apps/frontend/.next/static ./apps/frontend/.next/static
-COPY --from=builder /app/apps/frontend/public ./apps/frontend/public 2>/dev/null || true
+COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "apps/frontend/server.js"]
+# Next.js standalone entry
+CMD ["node", "server.js"]
