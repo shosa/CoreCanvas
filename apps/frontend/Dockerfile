@@ -29,10 +29,9 @@ RUN mkdir -p apps/frontend/public
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build Next.js (standalone output)
+# Build Next.js standalone
 WORKDIR /app/apps/frontend
 RUN npm run build
-
 
 ############################
 # Production stage
@@ -44,7 +43,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install openssl for Node (needed by Next)
+# Install openssl (Next standalone might need it)
 RUN apk add --no-cache openssl
 
 # Non-root user
@@ -53,11 +52,11 @@ RUN addgroup --system --gid 1001 nodejs && \
 USER nextjs
 
 # Copy standalone output
-COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/static ./static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/standalone/ ./  
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/static ./static
 
 EXPOSE 3000
 
-# Next.js standalone entry (server.js si trova nella root del standalone)
+# Entrypoint corretto: server.js è ora nella root del runner
 CMD ["node", "server.js"]
