@@ -18,8 +18,6 @@ services:
       PRINTER_DPI: ${PRINTER_DPI}
       APP_PORT: ${APP_PORT}
       NODE_ENV: production
-    ports:
-      - "3014:87"
     networks:
       - core-network
     command: sh -c "npx prisma migrate deploy || true && node dist/main"
@@ -36,7 +34,7 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NODE_ENV: production
     ports:
-      - "3008:3000"
+      - "3008:3008"
     depends_on:
       - backend
     networks:
