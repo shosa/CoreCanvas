@@ -16,6 +16,7 @@ services:
       PRINTER_HOST: ${PRINTER_HOST}
       PRINTER_PORT: ${PRINTER_PORT}
       PRINTER_DPI: ${PRINTER_DPI}
+      ZPLBOX_URL: http://core-zplbox:8080
       APP_PORT: ${APP_PORT}
       NODE_ENV: production
     networks:

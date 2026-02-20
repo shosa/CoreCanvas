@@ -7,6 +7,8 @@ export type BarcodeType = 'code128' | 'code39' | 'ean13' | 'ean8' | 'upca' | 'co
 
 export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 
+export type TextAlign = 'left' | 'center' | 'right';
+
 export interface BaseElement {
   id: string;
   type: ElementType;
@@ -21,9 +23,14 @@ export interface BaseElement {
 export interface TextElement extends BaseElement {
   type: 'text';
   text: string;
-  fontSize: number;  // mm
+  fontSize: number;    // mm
+  fontFamily: string;  // e.g. 'Arial', 'Helvetica', 'Times New Roman'
   bold: boolean;
-  inverted: boolean; // white text on black background (ZPL ^FR)
+  italic: boolean;
+  underline: boolean;
+  align: TextAlign;
+  letterSpacing: number; // px
+  inverted: boolean;   // white text on black background (ZPL ^FR)
 }
 
 export interface BarcodeElement extends BaseElement {

@@ -51,19 +51,27 @@ export function Toolbar() {
 
   const [imagePickerOpen, setImagePickerOpen] = useState(false);
 
+  const textAutoHeight = (fs: number) => fs * 1.2 + 0.5;
+
   const addText = () => {
+    const fs = 4;
     const el: TextElement = {
       id: generateId(),
       type: 'text',
       x: 10,
       y: 10,
       width: 30,
-      height: 8,
+      height: textAutoHeight(fs),
       rotation: 0,
       zIndex: Date.now(),
       text: 'Testo',
-      fontSize: 4,
+      fontSize: fs,
+      fontFamily: 'Arimo',
       bold: false,
+      italic: false,
+      underline: false,
+      align: 'left',
+      letterSpacing: 0,
       inverted: false,
     };
     addElement(el);
@@ -165,53 +173,56 @@ export function Toolbar() {
   };
 
   const addVariable = () => {
+    const fs = 4;
     const el: VariableElement = {
       id: generateId(),
       type: 'variable',
       x: 10,
       y: 10,
       width: 30,
-      height: 8,
+      height: textAutoHeight(fs),
       rotation: 0,
       zIndex: Date.now(),
       variableName: 'nome',
       defaultValue: '{{nome}}',
-      fontSize: 4,
+      fontSize: fs,
     };
     addElement(el);
   };
 
   const addCounter = () => {
+    const fs = 4;
     const el: CounterElement = {
       id: generateId(),
       type: 'counter',
       x: 10,
       y: 10,
       width: 25,
-      height: 8,
+      height: textAutoHeight(fs),
       rotation: 0,
       zIndex: Date.now(),
       counterName: 'default',
       startValue: 1,
       prefix: '',
       padding: 6,
-      fontSize: 4,
+      fontSize: fs,
     };
     addElement(el);
   };
 
   const addDateTime = () => {
+    const fs = 3;
     const el: DateTimeElement = {
       id: generateId(),
       type: 'datetime',
       x: 10,
       y: 10,
       width: 35,
-      height: 8,
+      height: textAutoHeight(fs),
       rotation: 0,
       zIndex: Date.now(),
       dateFormat: 'dd/MM/yyyy HH:mm',
-      fontSize: 3,
+      fontSize: fs,
     };
     addElement(el);
   };

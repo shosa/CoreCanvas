@@ -12,7 +12,6 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import PrintIcon from '@mui/icons-material/Print';
-import DescriptionIcon from '@mui/icons-material/Description';
 import { useSnackbar } from 'notistack';
 import axiosInstance from '@/lib/axios';
 import { PrinterStatus } from '@/types';
@@ -22,10 +21,9 @@ interface Props {
   onSave: () => void;
   onLoad: () => void;
   onPrint: () => void;
-  onPreviewZpl: () => void;
 }
 
-export function AppBar({ onSave, onLoad, onPrint, onPreviewZpl }: Props) {
+export function AppBar({ onSave, onLoad, onPrint }: Props) {
   const [printerStatus, setPrinterStatus] = useState<PrinterStatus | null>(null);
   const [configOpen, setConfigOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -64,9 +62,6 @@ export function AppBar({ onSave, onLoad, onPrint, onPreviewZpl }: Props) {
           </Button>
           <Button size="small" startIcon={<FolderOpenIcon />} onClick={onLoad}>
             Apri
-          </Button>
-          <Button size="small" startIcon={<DescriptionIcon />} onClick={onPreviewZpl}>
-            ZPL
           </Button>
           <Button
             size="small"

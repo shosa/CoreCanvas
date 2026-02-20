@@ -18,8 +18,18 @@ export const TextElement = forwardRef<any, Props>(
     const x = element.x * scale;
     const y = element.y * scale;
     const w = element.width * scale;
-    const h = element.height * scale;
-    const fontSize = element.fontSize * scale;
+    // height sempre derivata dal fontSize: fontSize * line-height + 2px margine
+    const fontSize = Math.round(element.fontSize) * scale;
+    const h = fontSize * 1.2 + 2;
+
+    const fontStyle = [
+      element.bold ? 'bold' : '',
+      element.italic ? 'italic' : '',
+    ].filter(Boolean).join(' ') || 'normal';
+
+    const textDecoration = element.underline ? 'underline' : '';
+    const textColor = element.inverted ? 'white' : 'black';
+    const padding = element.inverted ? 2 : 0;
 
     return (
       <Group
@@ -36,24 +46,23 @@ export const TextElement = forwardRef<any, Props>(
         onTransformEnd={onTransformEnd}
       >
         {element.inverted && (
-          <Rect
-            x={0}
-            y={0}
-            width={w}
-            height={h}
-            fill="black"
-          />
+          <Rect x={0} y={0} width={w} height={h} fill="black" />
         )}
         <Text
-          x={element.inverted ? 2 : 0}
-          y={element.inverted ? 1 : 0}
-          width={element.inverted ? w - 4 : w}
+          x={padding}
+          y={0}
+          width={w - padding * 2}
+          height={h}
           text={element.text}
           fontSize={fontSize}
-          fontStyle={element.bold ? 'bold' : 'normal'}
-          fill={element.inverted ? 'white' : 'black'}
+          fontFamily={element.fontFamily || 'Arimo'}
+          fontStyle={fontStyle}
+          textDecoration={textDecoration}
+          align={element.align || 'left'}
           verticalAlign="middle"
-          height={h}
+          letterSpacing={element.letterSpacing || 0}
+          fill={textColor}
+          wrap="word"
         />
       </Group>
     );

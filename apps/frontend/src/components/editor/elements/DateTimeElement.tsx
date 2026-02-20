@@ -17,8 +17,8 @@ interface Props {
 export const DateTimeElement = forwardRef<any, Props>(
   ({ element, scale, isSelected, onSelect, onDragEnd, onTransformEnd }, ref) => {
     const width = element.width * scale;
-    const height = element.height * scale;
-    const fontSize = element.fontSize * scale;
+    const fontSize = Math.round(element.fontSize) * scale;
+    const height = fontSize * 1.2 + 2;
 
     let previewText = element.dateFormat;
     try {
@@ -54,7 +54,9 @@ export const DateTimeElement = forwardRef<any, Props>(
           fontSize={fontSize}
           fill="#10b981"
           x={2}
-          y={(height - fontSize) / 2}
+          y={0}
+          height={height}
+          verticalAlign="middle"
         />
       </Group>
     );

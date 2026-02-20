@@ -59,16 +59,19 @@ export function ElementsLayer({ elements, selectedId, zoom, pixelsPerMm, onSelec
     const newWidth = (node.width() * scaleX) / scale;
     const newHeight = (node.height() * scaleY) / scale;
 
-    // For text-based elements, scale fontSize proportionally
     const isTextType = el && (el.type === 'text' || el.type === 'variable' || el.type === 'counter' || el.type === 'datetime');
     if (isTextType && 'fontSize' in el) {
+      // fontSize sempre intero, calcolato dalla scala media del resize
       const avgScale = (scaleX + scaleY) / 2;
+      const newFontSize = Math.max(1, Math.round(el.fontSize * avgScale));
+      // altezza = fontSize * line-height(1.2) + 2px margine, convertiti in mm
+      const autoHeight = newFontSize * 1.2 + 2 / pixelsPerMm;
       onUpdate(id, {
         x: node.x() / scale,
         y: node.y() / scale,
-        width: newWidth,
-        height: newHeight,
-        fontSize: Math.max(1, el.fontSize * avgScale),
+        width: Math.round(newWidth * 100) / 100,
+        height: autoHeight,
+        fontSize: newFontSize,
         rotation: node.rotation(),
       } as any);
     } else {
@@ -117,14 +120,25 @@ export function ElementsLayer({ elements, selectedId, zoom, pixelsPerMm, onSelec
     }
   };
 
+  const isImage = selectedId ? elements.find(el => el.id === selectedId)?.type === 'image' : false;
+
   return (
     <>
       {sorted.map(renderElement)}
       <Transformer
         ref={trRef}
         rotateEnabled={true}
+        keepRatio={isImage}
+        anchorSize={8}
+        anchorCornerRadius={2}
+        anchorStroke="#1e293b"
+        anchorFill="#fff"
+        borderStroke="#1e293b"
+        borderDash={[4, 2]}
+        rotateAnchorOffset={20}
         boundBoxFunc={(oldBox, newBox) => {
-          if (newBox.width < 10 || newBox.height < 10) return oldBox;
+          // minimum 5px in each direction
+          if (newBox.width < 5 || newBox.height < 5) return oldBox;
           return newBox;
         }}
       />

@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Put, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { PrinterService } from './printer.service';
+import { ZplBoxService } from './zplbox.service';
 import { ZplService } from '../zpl/zpl.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PrintDto, PreviewDto } from './dto/print.dto';
@@ -31,6 +32,7 @@ export class PrinterController {
     private readonly printerService: PrinterService,
     private readonly zplService: ZplService,
     private readonly prisma: PrismaService,
+    private readonly zplBoxService: ZplBoxService,
   ) {}
 
   @Post('print')
@@ -99,5 +101,21 @@ export class PrinterController {
   @Put('config')
   async updateConfig(@Body() dto: UpdatePrinterConfigDto) {
     return this.printerService.updateConfig(dto);
+  }
+  @Post('zplbox-print')
+  async zplboxPrint(@Body() body: { html: string; width: number; height: number }) {
+    const config = await this.printerService.getConfig();
+    return this.zplBoxService.printHtmlViaPdf(
+      body.html,
+      body.width,
+      body.height,
+      config.host,
+      config.port,
+    );
+  }
+
+  @Get('zplbox-status')
+  async zplboxStatus() {
+    return this.zplBoxService.checkStatus();
   }
 }

@@ -41,6 +41,9 @@ WORKDIR /app/apps/frontend
 # Disabilita la telemetry di Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Aggiunge il .bin della root al PATH (next e altri binari del monorepo)
+ENV PATH="/app/node_modules/.bin:${PATH}"
+
 # Passa le variabili NEXT_PUBLIC_* a build-time
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

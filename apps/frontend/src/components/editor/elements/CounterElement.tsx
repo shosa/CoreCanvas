@@ -16,8 +16,8 @@ interface Props {
 export const CounterElement = forwardRef<any, Props>(
   ({ element, scale, isSelected, onSelect, onDragEnd, onTransformEnd }, ref) => {
     const width = element.width * scale;
-    const height = element.height * scale;
-    const fontSize = element.fontSize * scale;
+    const fontSize = Math.round(element.fontSize) * scale;
+    const height = fontSize * 1.2 + 2;
 
     const previewValue = element.prefix + String(element.startValue).padStart(element.padding, '0');
 
@@ -48,7 +48,9 @@ export const CounterElement = forwardRef<any, Props>(
           fontSize={fontSize}
           fill="#f59e0b"
           x={2}
-          y={(height - fontSize) / 2}
+          y={0}
+          height={height}
+          verticalAlign="middle"
         />
       </Group>
     );

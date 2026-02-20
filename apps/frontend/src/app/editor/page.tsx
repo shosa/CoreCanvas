@@ -8,13 +8,11 @@ import { Canvas } from '@/components/editor/Canvas';
 import { PropertiesPanel } from '@/components/editor/PropertiesPanel';
 import { LabelSettings } from '@/components/editor/LabelSettings';
 import { PrintDialog } from '@/components/print/PrintDialog';
-import { ZplPreview } from '@/components/print/ZplPreview';
 import { SaveTemplateDialog } from '@/components/templates/SaveTemplateDialog';
 import { TemplateList } from '@/components/templates/TemplateList';
 
 export default function EditorPage() {
   const [printOpen, setPrintOpen] = useState(false);
-  const [zplOpen, setZplOpen] = useState(false);
   const [saveOpen, setSaveOpen] = useState(false);
   const [loadOpen, setLoadOpen] = useState(false);
 
@@ -24,7 +22,6 @@ export default function EditorPage() {
         onSave={() => setSaveOpen(true)}
         onLoad={() => setLoadOpen(true)}
         onPrint={() => setPrintOpen(true)}
-        onPreviewZpl={() => setZplOpen(true)}
       />
       <Toolbar />
 
@@ -43,7 +40,6 @@ export default function EditorPage() {
 
       {/* Dialogs */}
       <PrintDialog open={printOpen} onClose={() => setPrintOpen(false)} />
-      <ZplPreview open={zplOpen} onClose={() => setZplOpen(false)} />
       <SaveTemplateDialog open={saveOpen} onClose={() => setSaveOpen(false)} />
       <TemplateList open={loadOpen} onClose={() => setLoadOpen(false)} />
     </Box>
