@@ -1,3 +1,3 @@
 # CoreCanvas
 
-<!-- letto e compreso da @emme -->
+<!-- letto e compreso da emme -->
